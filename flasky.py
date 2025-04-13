@@ -34,9 +34,8 @@ def sms_reply():
 
         return jsonify({
             "success": True,
-            "reply": response.text, 
-            "to": endpoint
-        })
+            "reply": response.text 
+        }), 200
 
     except Exception as e:
         return jsonify({ "success": False, "error": str(e) }), 500
