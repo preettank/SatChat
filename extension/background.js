@@ -67,4 +67,69 @@ chrome.runtime.onInstalled.addListener(function(details) {
       });
     }
   });
+
+  // In background.js
+chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+  if (request.action === 'sendGeneratedMessageToVoice') {
+    // Find the active Google Voice tab
+    chrome.tabs.query({url: '*://voice.google.com/*'}, (tabs) => {
+      if (tabs.length > 0) {
+        // Send message to the first Google Voice tab
+        chrome.tabs.sendMessage(tabs[0].id, {
+          action: 'sendVoiceMessage',
+          text: request.text
+        }, (response) => {
+          console.log('Send message response:', response);
+          sendResponse(response);
+        });
+      } else {
+        sendResponse({ 
+          success: false, 
+          message: 'No Google Voice tab found' 
+        });
+      }
+    });
+    return true; // Required for async sendResponse
+  }
+});
+
+// background.js
+chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+  if (request.action === 'scrapeText') {
+    // Forward the scraping request to the content script of the active tab
+    chrome.tabs.query({url: '*://voice.google.com/*', active: true}, (tabs) => {
+      if (tabs.length > 0) {
+        chrome.tabs.sendMessage(tabs[0].id, {
+          action: 'scrapeText',
+          text: request.text,
+          endpoint: request.endpoint
+        }, (response) => {
+          sendResponse(response);
+        });
+      }
+    });
+    return true; // Enable async response
+  }
   
+  if (request.action === 'sendToGoogleVoice') {
+    // Find the active Google Voice tab
+    chrome.tabs.query({url: '*://voice.google.com/*'}, (tabs) => {
+      if (tabs.length > 0) {
+        // Send message to the first Google Voice tab
+        chrome.tabs.sendMessage(tabs[0].id, {
+          action: 'sendMessage',
+          text: request.text
+        }, (response) => {
+          console.log('Send message response:', response);
+          sendResponse(response);
+        });
+      } else {
+        sendResponse({ 
+          success: false, 
+          message: 'No Google Voice tab found' 
+        });
+      }
+    });
+    return true; // Required for async sendResponse
+  }
+});
