@@ -1,4 +1,4 @@
-from flask import Flask, request
+from flask import Flask, request, jsonify
 from twilio.twiml.messaging_response import MessagingResponse
 from google import genai
 import os
@@ -17,28 +17,32 @@ def home():
 
 @app.route("/sms", methods=["POST"])
 def sms_reply():
-    # Get message from Twilio webhook
-    user_msg = request.form.get("Body")
-    sender_number = request.form.get("From")
+    data = request.get_json()
 
-    print(f"[{sender_number}] says: {user_msg}")
+    print(data)
+    incoming_msg = data.get("text", "")
+    endpoint = data.get("endpoint", "")
 
-    # Call Gemini API
+    print(f"Incoming message: {incoming_msg}")
+
+    if not incoming_msg or not endpoint:
+        return jsonify({ "success": False, "error": "Missing text or endpoint" }), 400
+
     try:
         response = client.models.generate_content(
             model="gemini-2.0-flash",
-            contents=user_msg
+            contents=incoming_msg
         )
-        reply_text = response.text
-    except Exception as e:
-        reply_text = "Oops! Something went wrong. Try again later."
-        print(f"Gemini API error: {e}")
-    
-    # Create Twilio response
-    twilio_resp = MessagingResponse()
-    twilio_resp.message(reply_text)
-    return str(twilio_resp), 200
 
+        return jsonify({
+            "success": True,
+            "reply": response.text, 
+            "to": endpoint
+        })
+
+    except Exception as e:
+        return jsonify({ "success": False, "error": str(e) }), 500
+    
 @app.route("/test_gemini", methods=["GET"])
 def test_gemini():
     prompt = request.args.get("q", "Say something cool about satellites")
