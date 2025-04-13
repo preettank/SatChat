@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>SMS Text Scraper</title>
+  <style>
+    body {
+      width: 350px;
+      font-family: Arial, sans-serif;
+      padding: 15px;
+    }
+    h2 {
+      color: #4285f4;
+      margin-top: 0;
+    }
+    .section {
+      margin-bottom: 15px;
+      border-bottom: 1px solid #eee;
+      padding-bottom: 15px;
+    }
+    label {
+      display: block;
+      margin-bottom: 5px;
+      font-weight: bold;
+    }
+    select, input[type="text"] {
+      width: 100%;
+      padding: 8px;
+      margin-bottom: 10px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      box-sizing: border-box;
+    }
+    button {
+      background-color: #4285f4;
+      color: white;
+      border: none;
+      padding: 10px 15px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+    }
+    button:hover {
+      background-color: #357ae8;
+    }
+    #result {
+      margin-top: 15px;
+      padding: 10px;
+      background-color: #f7f7f7;
+      border-radius: 4px;
+      max-height: 200px;
+      overflow-y: auto;
+      word-break: break-word;
+    }
+    .success {
+      color: green;
+    }
+    .error {
+      color: red;
+    }
+    #copyButton {
+      background-color: #34a853;
+      margin-top: 10px;
+    }
+    #copyButton:hover {
+      background-color: #2e9549;
+    }
+    .selector-controls {
+      display: flex;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+    .selector-controls button {
+      margin-left: 10px;
+      padding: 8px;
+    }
+    #selectors {
+      margin-bottom: 10px;
+    }
+    .selector-row {
+      display: flex;
+      align-items: center;
+      margin-bottom: 5px;
+    }
+    .selector-row input {
+      flex-grow: 1;
+    }
+    .selector-row button {
+      margin-left: 5px;
+      padding: 5px 8px;
+      background-color: #ea4335;
+    }
+    .endpoint-section input {
+      margin-bottom: 0;
+    }
+  </style>
+</head>
+<body>
+  <h2>SMS Text Scraper</h2>
+  
+  <div class="section">
+    <label for="selectorMethod">Selection Method:</label>
+    <select id="selectorMethod">
+      <option value="css">CSS Selector</option>
+      <option value="xpath">XPath</option>
+      <option value="custom">Custom Selectors</option>
+    </select>
+    
+    <div id="standardSelector">
+      <label for="selector">Enter Selector:</label>
+      <input type="text" id="selector" placeholder="e.g., .message-text or //div[@class='message']">
+    </div>
+    
+    <div id="customSelectors" style="display:none;">
+      <label>Custom Selectors:</label>
+      <div id="selectors"></div>
+      <div class="selector-controls">
+        <input type="text" id="newSelector" placeholder="Add new selector...">
+        <button id="addSelector">Add</button>
+      </div>
+    </div>
+  </div>
+  
+  <div class="section endpoint-section">
+    <label for="endpoint">API Endpoint (optional):</label>
+    <input type="text" id="endpoint" placeholder="https://your-api.com/process">
+    <small>If provided, scraped text will be sent to this endpoint</small>
+  </div>
+  
+  <button id="scrapeButton">Scrape Text</button>
+  
+  <div id="result" style="display:none;">
+    <h3>Scraped Text:</h3>
+    <div id="scrapedText"></div>
+    <button id="copyButton">Copy to Clipboard</button>
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>
