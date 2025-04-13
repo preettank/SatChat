@@ -100,21 +100,45 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
    * @returns {Promise} - Promise resolving with the API response
    */
   async function sendToEndpoint(text, endpoint) {
-    const response = await fetch(endpoint, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        text: text,
-        source: window.location.href,
-        timestamp: new Date().toISOString()
-      })
+    console.log('Sending to endpoint:', {
+      endpoint: endpoint,
+      text: text,
+      source: window.location.href
     });
-    
-    if (!response.ok) {
-      throw new Error(`HTTP error ${response.status}`);
+  
+    try {
+      const response = await fetch(endpoint, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          text: text,
+          source: window.location.href,
+          timestamp: new Date().toISOString()
+        })
+      });
+      
+      console.log('Response status:', response.status);
+  
+      if (!response.ok) {
+        // Try to get error text from the response
+        const errorText = await response.text();
+        console.error('Endpoint error response:', errorText);
+        throw new Error(`HTTP error ${response.status}: ${errorText}`);
+      }
+      
+      const jsonResponse = await response.json();
+      console.log('Parsed JSON response:', jsonResponse);
+      
+      return jsonResponse;
+    } catch (error) {
+      console.error('Error in sendToEndpoint:', {
+        message: error.message,
+        name: error.name,
+        stack: error.stack
+      });
+      
+      throw error;  // Re-throw to allow caller to handle
     }
-    
-    return await response.json();
   }
