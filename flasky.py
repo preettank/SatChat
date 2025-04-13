@@ -1,5 +1,4 @@
 from flask import Flask, request, jsonify
-from twilio.twiml.messaging_response import MessagingResponse
 from google import genai
 import os
 from dotenv import load_dotenv
@@ -21,12 +20,11 @@ def sms_reply():
 
     print(data)
     incoming_msg = data.get("text", "")
-    endpoint = data.get("endpoint", "")
 
     print(f"Incoming message: {incoming_msg}")
 
-    if not incoming_msg or not endpoint:
-        return jsonify({ "success": False, "error": "Missing text or endpoint" }), 400
+    if not incoming_msg:
+        return jsonify({ "success": False, "error": "Missing text" }), 400
 
     try:
         response = client.models.generate_content(

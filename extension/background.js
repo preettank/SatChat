@@ -21,7 +21,6 @@ chrome.runtime.onInstalled.addListener(function(details) {
     contexts: ['selection']
   });
   
-  // Handle context menu clicks
   chrome.contextMenus?.onClicked.addListener((info, tab) => {
     if (info.menuItemId === 'scrapeSelection') {
       const selectedText = info.selectionText;
@@ -42,11 +41,34 @@ chrome.runtime.onInstalled.addListener(function(details) {
               text: selectedText,
               source: tab.url,
               timestamp: new Date().toISOString(),
-              method: 'context_menu_selection'
+              method: 'context_menu_selection',
+              endpoint: tab.url // Pass the current tab URL as the endpoint
             })
-          }).then(response => {
-            console.log('Sent selected text to endpoint');
-          }).catch(error => {
+          })
+          .then(response => {
+            // Check if the response is OK
+            if (!response.ok) {
+              throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return response.json();
+          })
+          .then(data => {
+            // Log the full response to the console
+            console.log('Full Backend Response:', data);
+            
+            // Check if the response was successful
+            if (data.success) {
+              console.log('Generated Reply:', data.reply);
+              
+              // Optionally, you can save the reply to storage or send it to the popup
+              chrome.storage.local.set({ 
+                lastGeneratedReply: data.reply 
+              });
+            } else {
+              console.error('Backend Error:', data.error);
+            }
+          })
+          .catch(error => {
             console.error('Error sending to endpoint:', error);
           });
         }
