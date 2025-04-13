@@ -92,6 +92,64 @@
     .endpoint-section input {
       margin-bottom: 0;
     }
+    
+    /* Monitoring Toggle Styles */
+    .toggle-container {
+      display: flex;
+      align-items: center;
+      margin-bottom: 15px;
+    }
+    .toggle-switch {
+      position: relative;
+      display: inline-block;
+      width: 50px;
+      height: 24px;
+      margin-right: 10px;
+    }
+    .toggle-switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+    .slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: #ccc;
+      transition: .4s;
+      border-radius: 24px;
+    }
+    .slider:before {
+      position: absolute;
+      content: "";
+      height: 16px;
+      width: 16px;
+      left: 4px;
+      bottom: 4px;
+      background-color: white;
+      transition: .4s;
+      border-radius: 50%;
+    }
+    input:checked + .slider {
+      background-color: #34a853;
+    }
+    input:checked + .slider:before {
+      transform: translateX(26px);
+    }
+    .monitoring-active {
+      color: #34a853;
+      font-weight: bold;
+    }
+    .monitoring-inactive {
+      color: #757575;
+    }
+    .monitor-label {
+      font-weight: normal;
+      margin-left: 5px;
+    }
   </style>
 </head>
 <body>
@@ -124,6 +182,17 @@
     <label for="endpoint">API Endpoint (optional):</label>
     <input type="text" id="endpoint" placeholder="https://your-api.com/process">
     <small>If provided, scraped text will be sent to this endpoint</small>
+  </div>
+  
+  <div class="section">
+    <div class="toggle-container">
+      <label class="toggle-switch">
+        <input type="checkbox" id="monitorToggle">
+        <span class="slider"></span>
+      </label>
+      <span id="monitorStatus" class="monitoring-inactive">Monitoring: Inactive</span>
+    </div>
+    <small>When enabled, continuously monitors for new text and automatically sends to the API</small>
   </div>
   
   <button id="scrapeButton">Scrape Text</button>
